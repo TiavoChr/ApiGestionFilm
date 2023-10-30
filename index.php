@@ -32,6 +32,33 @@ function createFilm($pdo, $data) {
     return $success;
 }
 
+if (!empty($_POST['ressource'])) {
+    if ($_POST['ressource'] == "films"){
+        $table = "film";
+    } else if ($_POST['ressource'] == "acteurs" || $_POST['ressource'] == "réalisateurs"){
+        $table = "personne";
+    }
+    if (!empty($_POST['nom'])) {
+        getRessourceByNom($table, $_POST['nom'], $pdo);
+    } else {
+        getListRessource($table, $pdo);
+    }
+}
+
+function getListRessource($Table, $pdo) {
+    $stmt = $pdo->prepare("SELECT * FROM ". $Table ."");
+    $stmt->execute();
+    $films = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $films;
+}
+
+function getRessourceByNom($table, $Nom, $pdo) {
+    $stmt = $pdo->prepare("SELECT * FROM ". $table ."WHERE nom = '". $Nom ."'");
+    $stmt->execute();
+    $films = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $films;
+}
+
 $films = getFilms($pdo);
 $retour["resultat"]["film"] = $films;
 echo json_encode($retour);
